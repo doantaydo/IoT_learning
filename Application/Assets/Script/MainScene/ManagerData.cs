@@ -3,7 +3,6 @@ using UnityEngine.UI;
 
 public class ManagerData : MonoBehaviour
 {
-    //public ManagerData instance;
     public Text tempField, humidField;
     float curTemp, curHumid;
     bool curLedState, curBumpState;
@@ -11,8 +10,7 @@ public class ManagerData : MonoBehaviour
 
     void Start()
     {
-        count = 0;
-        updateValue();
+        count = 50;
     }
     void updateValue() {
         // get data from server
@@ -26,6 +24,7 @@ public class ManagerData : MonoBehaviour
         // change in UI
         BumpButton.instance.updateState(curBumpState);
         LedButton.instance.updateState(curLedState);
+
         tempField.text = curTemp.ToString();
         humidField.text = curHumid.ToString();
     }

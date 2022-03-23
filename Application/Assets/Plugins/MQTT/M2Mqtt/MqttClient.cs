@@ -789,8 +789,7 @@ namespace uPLibrary.Networking.M2Mqtt
         /// <returns>Message Id related to SUBSCRIBE message</returns>
         public ushort Subscribe(string[] topics, byte[] qosLevels)
         {
-            MqttMsgSubscribe subscribe =
-                new MqttMsgSubscribe(topics, qosLevels);
+            MqttMsgSubscribe subscribe = new MqttMsgSubscribe(topics, qosLevels);
             subscribe.MessageId = this.GetMessageId();
 
             // enqueue subscribe request into the inflight queue

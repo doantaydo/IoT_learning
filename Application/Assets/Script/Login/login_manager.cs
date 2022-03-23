@@ -13,7 +13,7 @@ public class login_manager : MonoBehaviour
     {
         if (instance == null) instance = this;
         bro_uri_txt = PlayerPrefs.GetString("bro_uri_txt","mqttserver.tk");
-        user_txt = PlayerPrefs.GetString("user_txt","12345678");
+        user_txt = PlayerPrefs.GetString("user_txt","bkiot");
         pwd_txt = PlayerPrefs.GetString("pwd_txt","12345678");
         printTxt();
     }
@@ -22,6 +22,7 @@ public class login_manager : MonoBehaviour
         bro_URI.text = bro_uri_txt;
         username.text = user_txt;
         pwd.text = pwd_txt;
+        Debug.Log(user_txt);
     }
     void SaveTxt() {
         PlayerPrefs.SetString("bro_uri_txt",bro_uri_txt);
