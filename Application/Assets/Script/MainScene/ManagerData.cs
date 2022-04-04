@@ -3,23 +3,27 @@ using UnityEngine.UI;
 
 public class ManagerData : MonoBehaviour
 {
+    public static ManagerData instance;
     public Text tempField, humidField;
-    float curTemp, curHumid;
-    bool curLedState, curBumpState;
+    public float curTemp, curHumid;
+    public bool curLedState, curBumpState;
     int count = 0;
+    void Awake() {
+        if (instance == null) instance = this;
+    }
 
     void Start()
     {
         count = 50;
     }
-    void updateValue() {
+    void Update() {
         // get data from server
 
         // fake value
-        curLedState = false;
-        curBumpState = false;
-        curTemp = (float)((int)(Random.Range(-50f,100f) * 100)) / 100;
-        curHumid = (int)(Random.Range(0f, 100f));
+        // curLedState = false;
+        // curBumpState = false;
+        // curTemp = (float)((int)(Random.Range(-50f,100f) * 100)) / 100;
+        // curHumid = (int)(Random.Range(0f, 100f));
 
         // change in UI
         BumpButton.instance.updateState(curBumpState);
@@ -29,12 +33,12 @@ public class ManagerData : MonoBehaviour
         humidField.text = curHumid.ToString();
     }
     
-    void FixedUpdate()
-    {
-        if (count == 50) {
-            count = -1;
-            updateValue();
-        }
-        count++;
-    }
+    // void FixedUpdate()
+    // {
+    //     if (count == 50) {
+    //         count = -1;
+    //         updateValue();
+    //     }
+    //     count++;
+    // }
 }

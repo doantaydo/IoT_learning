@@ -12,7 +12,7 @@ public class RollEff : MonoBehaviour
 
     void Update()
     {
-        amount += 0.005f;
+        amount += 0.002f;
         if (amount > 1f) amount = 0f;
         img.fillAmount = amount;
     }

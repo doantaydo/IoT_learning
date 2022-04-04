@@ -9,6 +9,7 @@ public class login_manager : MonoBehaviour
     static login_manager instance;
     public InputField bro_URI, username, pwd;
     string bro_uri_txt, user_txt, pwd_txt;
+    public GameObject mainLoginZone, logInFail;
     void Start()
     {
         if (instance == null) instance = this;
@@ -38,13 +39,17 @@ public class login_manager : MonoBehaviour
         getInputField();
         if (pwd_txt != "12345678") {
             Debug.Log("Fail Login!!");
-            SceneManager.LoadScene(0);
+            mainLoginZone.SetActive(false);
+            logInFail.SetActive(true);
         }
         else {
             Debug.Log("Login Success!!");
             SaveTxt();
             SceneManager.LoadScene(1);
         }
+    }
+    public void reLoad() {
+        SceneManager.LoadScene(0);
     }
 
 }
