@@ -6,6 +6,8 @@ public class ButtonPrototype : MonoBehaviour
 {
     protected bool isOn;
     public GameObject redLed, greenLed;
+    public GameObject btn;
+    protected bool flag = false, state_bef;
     bool check;
     int count;
     SpriteRenderer red_rend, green_rend;

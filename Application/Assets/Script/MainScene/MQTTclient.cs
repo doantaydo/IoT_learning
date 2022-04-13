@@ -197,7 +197,7 @@ namespace M2MqttUnity.Examples
             // }
         }
 
-        private void OnDestroy() {
+        public void OnDestroy() {
             Disconnect();
         }
 

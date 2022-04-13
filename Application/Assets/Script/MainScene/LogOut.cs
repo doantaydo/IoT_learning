@@ -15,9 +15,11 @@ public class LogOut : MonoBehaviour
         canvasLogOut.SetActive(ifOpening);
     }
     public void notLogOut() {
-        SceneManager.LoadScene(1);
+        activeSureToLogOut();
+        //SceneManager.LoadScene(1);
     }
     public void logOut() {
+        M2MqttUnity.Examples.MQTTclient.instance.OnDestroy();
         SceneManager.LoadScene(0);
     }
 }

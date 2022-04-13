@@ -37,7 +37,7 @@ public class login_manager : MonoBehaviour
     }
     public void checkLogin() {
         getInputField();
-        if (pwd_txt != "12345678") {
+        if (pwd_txt != "12345678" || user_txt != "bkiot") {
             Debug.Log("Fail Login!!");
             mainLoginZone.SetActive(false);
             logInFail.SetActive(true);
