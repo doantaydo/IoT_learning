@@ -66,7 +66,7 @@ namespace M2MqttUnity.Examples
             //}
             SubscribeTopics();
         }
-        int count = 0;
+        //int count = 0;
         bool isFirst = true;
         protected override void SubscribeTopics() {
             if (topic_status != "")
@@ -80,23 +80,14 @@ namespace M2MqttUnity.Examples
                     isFirst = false;
                 }
                 else {
-                    if (count == 10)
-                    {
-                        Debug.Log("Pub");
-                        float curTemp = (float)((int)(UnityEngine.Random.Range(-50f, 100f) * 100)) / 100;
-                        float curHumid = (float)((int)(UnityEngine.Random.Range(0f, 100f) * 100)) / 100;
-                        pubStatus(curTemp, curHumid);
-                        count = 0;
-                    }
-                    
                     Debug.Log("Sub");
-                    Debug.Log(count.ToString());
+                    //Debug.Log(count.ToString());
                     client.Subscribe(new string[] { topic_status }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
                     client.Subscribe(new string[] { topic_led }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
                     client.Subscribe(new string[] { topic_bump }, new byte[] { MqttMsgBase.QOS_LEVEL_EXACTLY_ONCE });
                 }
                 
-                count++;
+                //count++;
             }
         }
 
