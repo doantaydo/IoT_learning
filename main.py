@@ -1,28 +1,72 @@
 print("Turn on ThingsBoard")
+#from operator import truediv
+import random
 import paho.mqtt.client as mqttclient
 import time
 import json
+import serial.tools.list_ports
+import serial
 
 BROKER_ADDRESS = "demo.thingsboard.io"
 PORT = 1883
 THINGS_BOARD_ACCESS_TOKEN = "Z0NcbEWngaLorv8ETyiA"
 
-
 def subscribed(client, userdata, mid, granted_qos):
     print("Subscribed...")
+
+def processData(data):
+    data = data.replace("!", "")
+    data = data.replace("#", "")
+    splitData = data.split(",")
+    print(splitData)
+    # TODO : Add your source code to publish data to Thingsboard
+    value = [0,0]
+    check = True
+    try:
+        for i in range(0,2):
+            splitValue = splitData[i].split(":")
+            value[i] = (float)(splitValue[1])
+    except:
+        check = False
+    if check:
+        collect_data = {'temperature': value[0], 'light':value[1]}
+        client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
 
 
 def recv_message(client, userdata, message):
     print("Received: ", message.payload.decode("utf-8"))
-    temp_data = {'value': True}
+    temp_data = {}
+    cmd = 1
+    # TODO : Update the cmd to control 2 devices
+
     try:
         jsonobj = json.loads(message.payload)
-        if jsonobj['method'] == "setValue":
+        temp_data['setValue'] = jsonobj['params']
+        if jsonobj['method'] == "setLED":
+            temp_data['value'] = jsonobj['params']
+            client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
+        if jsonobj['method'] == "setFAN":
             temp_data['value'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
     except:
         pass
+    
+    # if len(bbc_port) > 0:
+    #     ser.write((str(cmd) + "#").encode())
 
+def readSerial():
+    bytesToRead = ser.inWaiting()
+    if (bytesToRead > 0):
+        global mess
+        mess = mess + ser.read(bytesToRead).decode("UTF-8")
+        while ("#" in mess) and ("!" in mess):
+            start = mess.find("!")
+            end = mess.find("#")
+            processData(mess[start:end + 1])
+            if (end == len(mess)):
+                mess = ""
+            else:
+                mess = mess[end+1:]
 
 def connected(client, usedata, flags, rc):
     if rc == 0:
@@ -31,7 +75,6 @@ def connected(client, usedata, flags, rc):
     else:
         print("Connection is failed")
 
-def updateLongLat(): pass
 
 client = mqttclient.Client("Gateway_Thingsboard")
 client.username_pw_set(THINGS_BOARD_ACCESS_TOKEN)
@@ -44,16 +87,24 @@ client.on_subscribe = subscribed
 client.on_message = recv_message
 
 temp = 30
-humi = 50
+# humi = 50
 light_intensity = 100
-counter = 0
-longitude = 106.7
-latitude = 10.6
+# counter = 0
+# longitude = 106.7
+# latitude = 10.6
+
+# mess = ""
+# bbc_port = "COM3"
+# ser = serial.Serial(port="COM7", baudrate=115200, timeout = 30000)
+
+#client.publish('v1/devices/me/attributes', json.dumps(collect_data), 1)
+
 while True:
-    collect_data = {'temperature': temp, 'humidity': humi, 'light':light_intensity, 'longitude': longitude, 'latitude': latitude}
-    temp += 1
-    humi += 1
-    light_intensity += 1
-    #longitude, latitude = updateLongLat()
-    client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+    # temp = random.randrange(0,100)
+    # light_intensity = random.randrange(0,100)
+    # collect_data = {'temperature': temp, 'humidity':light_intensity}
+    # client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+    # print(collect_data)
+    # while ser.inWaiting():
+    #     readSerial()
     time.sleep(10)
