@@ -17,20 +17,40 @@ def subscribed(client, userdata, mid, granted_qos):
 def processData(data):
     data = data.replace("!", "")
     data = data.replace("#", "")
-    splitData = data.split(",")
+    splitData = data.split(":")
     print(splitData)
     # TODO : Add your source code to publish data to Thingsboard
-    value = [0,0]
-    check = True
-    try:
-        for i in range(0,2):
-            splitValue = splitData[i].split(":")
-            value[i] = (float)(splitValue[1])
-    except:
-        check = False
-    if check:
-        collect_data = {'temperature': value[0], 'light':value[1]}
-        client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+    temp = False
+    pubTemp = False
+    light = False
+    pubLight = False
+    humid = False
+    pubHumid = False
+    for d in splitData:
+        if d == "TEMP": temp = True
+        elif d == "LIGHT": light = True
+        elif d == "HUMID": humid = True
+        else:
+            if pubTemp == False:
+                if temp == True:
+                    temp = d
+                    pubTemp = True
+            if pubLight == False:
+                if light == True:
+                    light = d
+                    pubLight = True
+            if pubHumid == False:
+                if humid == True:
+                    humid = d
+                    pubHumid = True
+        
+    if (pubTemp == False and pubLight == False and pubHumid == False): return
+
+    collect_data = {}
+    if pubTemp: collect_data['temperature'] = temp
+    if pubLight: collect_data['light'] = light
+    if pubHumid: collect_data['humidity'] = humid
+    client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
 
 
 def recv_message(client, userdata, message):
@@ -41,7 +61,7 @@ def recv_message(client, userdata, message):
 
     try:
         jsonobj = json.loads(message.payload)
-        temp_data['setValue'] = jsonobj['params']
+        #temp_data['setValue'] = jsonobj['params']
         if jsonobj['method'] == "setLED":
             temp_data['value'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
@@ -51,8 +71,8 @@ def recv_message(client, userdata, message):
     except:
         pass
     
-    # if len(bbc_port) > 0:
-    #     ser.write((str(cmd) + "#").encode())
+    if len(bbc_port) > 0:
+        ser.write((str(cmd) + "#").encode())
 
 def readSerial():
     bytesToRead = ser.inWaiting()
@@ -93,13 +113,16 @@ light_intensity = 100
 # longitude = 106.7
 # latitude = 10.6
 
-# mess = ""
-# bbc_port = "COM3"
-# ser = serial.Serial(port="COM7", baudrate=115200, timeout = 30000)
+mess = ""
+bbc_port = "COM4"
+if len(bbc_port) > 0:
+    ser = serial.Serial(port=bbc_port, baudrate=115200, timeout = 30000)
 
 #client.publish('v1/devices/me/attributes', json.dumps(collect_data), 1)
 
 while True:
+    if len(bbc_port) > 0:
+        readSerial()
     # temp = random.randrange(0,100)
     # light_intensity = random.randrange(0,100)
     # collect_data = {'temperature': temp, 'humidity':light_intensity}
@@ -107,4 +130,4 @@ while True:
     # print(collect_data)
     # while ser.inWaiting():
     #     readSerial()
-    time.sleep(10)
+    time.sleep(1)
