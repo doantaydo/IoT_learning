@@ -62,21 +62,31 @@ def recv_message(client, userdata, message):
     temp_data = {}
     cmd = 1
     # TODO : Update the cmd to control 2 devices
-
+    # 0: turn off the led
+    # 1: turn on the led
+    # 2: turn off the fan
+    # 3: turn on the fan
     try:
         jsonobj = json.loads(message.payload)
         #temp_data['setValue'] = jsonobj['params']
         if jsonobj['method'] == "setLED":
+            if jsonobj['params'] == True:
+                cmd = 1
+            else:
+                cmd = 0
             temp_data['LED'] = jsonobj['params']
             temp_data['setLED'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
         if jsonobj['method'] == "setFAN":
+            if jsonobj['params'] == True:
+                cmd = 3
+            else:
+                cmd = 2
             temp_data['FAN'] = jsonobj['params']
             temp_data['setFAN'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
     except:
         pass
-    
     if len(bbc_port) > 0:
         ser.write((str(cmd) + "#").encode())
 
