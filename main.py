@@ -20,12 +20,16 @@ def processData(data):
     splitData = data.split(":")
     print(splitData)
     # TODO : Add your source code to publish data to Thingsboard
+    # var is storage value
+    # pubVar is flag to mark this var has value
     temp = False
     pubTemp = False
     light = False
     pubLight = False
     humid = False
     pubHumid = False
+    # if at index i we have label
+    # at index i + 1 will be the value of this label
     for d in splitData:
         if d == "TEMP": temp = True
         elif d == "LIGHT": light = True
@@ -43,9 +47,9 @@ def processData(data):
                 if humid == True:
                     humid = d
                     pubHumid = True
-        
+    # if don't get any data, don't publish to server
     if (pubTemp == False and pubLight == False and pubHumid == False): return
-
+    # get data and publish to server
     collect_data = {}
     if pubTemp: collect_data['temperature'] = temp
     if pubLight: collect_data['light'] = light
@@ -63,10 +67,12 @@ def recv_message(client, userdata, message):
         jsonobj = json.loads(message.payload)
         #temp_data['setValue'] = jsonobj['params']
         if jsonobj['method'] == "setLED":
-            temp_data['value'] = jsonobj['params']
+            temp_data['LED'] = jsonobj['params']
+            temp_data['setLED'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
         if jsonobj['method'] == "setFAN":
-            temp_data['value'] = jsonobj['params']
+            temp_data['FAN'] = jsonobj['params']
+            temp_data['setFAN'] = jsonobj['params']
             client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
     except:
         pass
@@ -114,7 +120,7 @@ light_intensity = 100
 # latitude = 10.6
 
 mess = ""
-bbc_port = "COM4"
+bbc_port = ""
 if len(bbc_port) > 0:
     ser = serial.Serial(port=bbc_port, baudrate=115200, timeout = 30000)
 
