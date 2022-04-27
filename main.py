@@ -22,39 +22,45 @@ def processData(data):
     # TODO : Add your source code to publish data to Thingsboard
     # var is storage value
     # pubVar is flag to mark this var has value
-    temp = False
-    pubTemp = False
-    light = False
-    pubLight = False
-    humid = False
-    pubHumid = False
-    # if at index i we have label
-    # at index i + 1 will be the value of this label
-    for d in splitData:
-        if d == "TEMP": temp = True
-        elif d == "LIGHT": light = True
-        elif d == "HUMID": humid = True
-        else:
-            if pubTemp == False:
-                if temp == True:
-                    temp = d
-                    pubTemp = True
-            if pubLight == False:
-                if light == True:
-                    light = d
-                    pubLight = True
-            if pubHumid == False:
-                if humid == True:
-                    humid = d
-                    pubHumid = True
-    # if don't get any data, don't publish to server
-    if (pubTemp == False and pubLight == False and pubHumid == False): return
-    # get data and publish to server
-    collect_data = {}
-    if pubTemp: collect_data['temperature'] = temp
-    if pubLight: collect_data['light'] = light
-    if pubHumid: collect_data['humidity'] = humid
+    if (splitData[1] == "TEMP"):
+        collect_data = {'temperature':splitData[2]}
+    else:
+        collect_data = {'light':splitData[2]}
     client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+    # THIS ZONE USE FOR ANOTHER CASES
+    # temp = False
+    # pubTemp = False
+    # light = False
+    # pubLight = False
+    # humid = False
+    # pubHumid = False
+    # # if at index i we have label
+    # # at index i + 1 will be the value of this label
+    # for d in splitData:
+    #     if d == "TEMP": temp = True
+    #     elif d == "LIGHT": light = True
+    #     elif d == "HUMID": humid = True
+    #     else:
+    #         if pubTemp == False:
+    #             if temp == True:
+    #                 temp = d
+    #                 pubTemp = True
+    #         if pubLight == False:
+    #             if light == True:
+    #                 light = d
+    #                 pubLight = True
+    #         if pubHumid == False:
+    #             if humid == True:
+    #                 humid = d
+    #                 pubHumid = True
+    # # if don't get any data, don't publish to server
+    # if (pubTemp == False and pubLight == False and pubHumid == False): return
+    # # get data and publish to server
+    # collect_data = {}
+    # if pubTemp: collect_data['temperature'] = temp
+    # if pubLight: collect_data['light'] = light
+    # if pubHumid: collect_data['humidity'] = humid
+    # client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
 
 
 def recv_message(client, userdata, message):
@@ -130,7 +136,7 @@ light_intensity = 100
 # latitude = 10.6
 
 mess = ""
-bbc_port = ""
+bbc_port = "COM8"
 if len(bbc_port) > 0:
     ser = serial.Serial(port=bbc_port, baudrate=115200, timeout = 30000)
 
