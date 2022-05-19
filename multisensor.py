@@ -22,46 +22,51 @@ def processData(data):
     # TODO : Add your source code to publish data to Thingsboard
     # var is storage value
     # pubVar is flag to mark this var has value
-    if (splitData[1] == "TEMP"):
-        collect_data = {'temperature':splitData[2]}
-    else:
-        collect_data = {'light':splitData[2]}
+    collect_data = {splitData[1]:splitData[2]}
     client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
+    # if (splitData[1][:-1] == "TEMP"):
+    #     collect_data = {'temperature' + splitData[1][-1:]:splitData[2]}
+    # else:
+    #     collect_data = {'light':splitData[2]}
+    # client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
 
-
+def setJson(json, jsonobj, id):
+    temp_data = {}
+    cmd = 0
+    if jsonobj['method'] == "setLED" + str(id):
+        if jsonobj['params'] == True:
+            cmd = 1 + id * 10
+        else:
+            cmd = 0 + id * 10
+        temp_data['LED'  + str(id)] = jsonobj['params']
+        temp_data['setLED'  + str(id)] = jsonobj['params']
+        client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
+    if jsonobj['method'] == "setFAN"  + str(id):
+        if jsonobj['params'] == True:
+            cmd = 3 + id * 10
+        else:
+            cmd = 2 + id * 10
+        temp_data['FAN' + str(id)] = jsonobj['params']
+        temp_data['setFAN' + str(id)] = jsonobj['params']
+        client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
+    return cmd
 
 def recv_message(client, userdata, message):
     print("Received: ", message.payload.decode("utf-8"))
-    temp_data = {}
-    cmd = 1
-    # TODO : Update the cmd to control 2 devices
-    # 0: turn off the led
-    # 1: turn on the led
-    # 2: turn off the fan
-    # 3: turn on the fan
+    cmd = -1
     try:
         jsonobj = json.loads(message.payload)
-        #temp_data['setValue'] = jsonobj['params']
-        if jsonobj['method'] == "setLED":
-            if jsonobj['params'] == True:
-                cmd = 1
-            else:
-                cmd = 0
-            temp_data['LED'] = jsonobj['params']
-            temp_data['setLED'] = jsonobj['params']
-            client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
-        if jsonobj['method'] == "setFAN":
-            if jsonobj['params'] == True:
-                cmd = 3
-            else:
-                cmd = 2
-            temp_data['FAN'] = jsonobj['params']
-            temp_data['setFAN'] = jsonobj['params']
-            client.publish('v1/devices/me/attributes', json.dumps(temp_data), 1)
+        temp_cmd = setJson(json, jsonobj, 1)
+        if temp_cmd != 0: cmd = temp_cmd
+
+        temp_cmd = setJson(json, jsonobj, 2)
+        if temp_cmd != 0: cmd = temp_cmd
+
     except:
         pass
     if len(bbc_port) > 0:
-        ser.write((str(cmd) + "#").encode())
+        if cmd != -1:
+            ser.write((str(cmd) + "#").encode())
 
 def readSerial():
     bytesToRead = ser.inWaiting()
@@ -95,15 +100,10 @@ client.loop_start()
 client.on_subscribe = subscribed
 client.on_message = recv_message
 
-temp = 30
-light_intensity = 100
-
 mess = ""
 bbc_port = "COM3"
 if len(bbc_port) > 0:
     ser = serial.Serial(port=bbc_port, baudrate=115200, timeout = 30000)
-
-#client.publish('v1/devices/me/attributes', json.dumps(collect_data), 1)
 
 while True:
     if len(bbc_port) > 0:
