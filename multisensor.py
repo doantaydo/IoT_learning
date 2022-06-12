@@ -66,6 +66,7 @@ def recv_message(client, userdata, message):
         pass
     if len(bbc_port) > 0:
         if cmd != -1:
+            print("Cmd : " + str(cmd))
             ser.write((str(cmd) + "#").encode())
 
 def readSerial():
@@ -99,6 +100,10 @@ client.loop_start()
 
 client.on_subscribe = subscribed
 client.on_message = recv_message
+
+# collect_data = {"TEMP1":0,"TEMP2":1,"LIGHT1":2,"LIGHT2":3}
+# print(collect_data)
+# client.publish('v1/devices/me/telemetry', json.dumps(collect_data), 1)
 
 mess = ""
 bbc_port = "COM3"
